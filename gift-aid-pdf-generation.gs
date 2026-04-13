@@ -9,6 +9,16 @@
  *    Instead, it sends an email notification to both the Finance Team and the respondent.
  */
 
+/**
+ * Deployment
+ * 1. It is highly recommended to use a dedicated service account to create the Google Form and deploy this script.
+ * 2. Create the Google Form with reference to the sample Gift Aid declaration for multiple donations, available here:
+ *    https://www.gov.uk/claim-gift-aid/gift-aid-declarations
+ * 3. Create the template Google Docs file provided in this repository. Make sure the service account has read access to it.
+ * 4. Make sure the target storage folder exists. Create it if necessary. Make sure the service account has read and write access to it.
+ * 5. Update the script constants as required, then deploy the script by attaching it to the form.
+ */
+
 // Test data for manual execution of testOnFormSubmit
 function testOnFormSubmit() {
   const e = {
@@ -17,8 +27,8 @@ function testOnFormSubmit() {
       "Legal first name": ["Peter"],
       "Home address (line 1)": ["123 High Street"],
       "Your home address (line 2) (Optional)": [""],
-      "Town or City": ["Tonbridge"],
-      "County (Optional)": ["Kent"],
+      "Town or City": ["Peterborough"],
+      "County (Optional)": [""],
       "Full post code": ["AB1 1AA"],
       "Email Address": ["a_testing_email_address"],
       "What is the coverage of this declaration?": [
@@ -44,7 +54,7 @@ function onFormSubmit(e) {
   const CONFIG = {
     templateDocId: "place_the_file_id_of_the_template",
     targetFolderId: "place_the_folder_id_of_the_target_folder",
-    churchName: "Your charitable organisation name",
+    orgName: "Your charitable organisation name",
     financeEmail: "the_finance_team_email_address",
   };
 
@@ -84,7 +94,7 @@ function onFormSubmit(e) {
     postcode,
   ]);
 
-  // Define additional constants derived from the form responses
+  // Additional constant definition derived from the form responses
   const fullName = `${firstName} ${lastName}`.trim();
   const declarationDate = formatDate_(timestamp);
   const requiredAccepted =
@@ -170,7 +180,7 @@ function onFormSubmit(e) {
     sendGiftAidEmail_({
       to: email,
       fullName: fullName,
-      churchName: CONFIG.churchName,
+      orgName: CONFIG.orgName,
       declarationDate: declarationDate,
       pdfBlob: pdfBlob,
     });
@@ -182,7 +192,7 @@ function onFormSubmit(e) {
     sendFinanceNotification_({
       to: CONFIG.financeEmail,
       fullName: fullName,
-      churchName: CONFIG.churchName,
+      orgName: CONFIG.orgName,
       declarationDate: declarationDate,
       pdfBlob: pdfBlob,
       pdfFileUrl: pdfFile.getUrl(),
@@ -198,12 +208,12 @@ function sendGiftAidEmail_(data) {
 
   const bodyText =
     `Dear ${data.fullName},\n\n` +
-    `Thank you for submitting your Gift Aid declaration to ${data.churchName}.\n` +
+    `Thank you for submitting your Gift Aid declaration to ${data.orgName}.\n` +
     `Please find attached a copy of your declaration for your records.\n\n` +
     `Declaration date: ${data.declarationDate}\n\n` +
-    `If you have any questions or need to update your details, please contact the church.\n\n` +
+    `If you have any questions or need to update your details, please contact the org.\n\n` +
     `Kind regards,\n` +
-    `${data.churchName}`;
+    `${data.orgName}`;
 
   const bodyHtml = `
     <html>
@@ -211,7 +221,7 @@ function sendGiftAidEmail_(data) {
         <p>Dear ${escapeHtml_(data.fullName)},</p>
         <p>
           Thank you for submitting your Gift Aid declaration to
-          ${escapeHtml_(data.churchName)}.
+          ${escapeHtml_(data.orgName)}.
         </p>
         <p>
           Please find attached a copy of your declaration for your records.
@@ -224,7 +234,7 @@ function sendGiftAidEmail_(data) {
         </p>
         <p>
           Kind regards,<br>
-          ${escapeHtml_(data.churchName)}
+          ${escapeHtml_(data.orgName)}
         </p>
       </body>
     </html>
@@ -233,7 +243,7 @@ function sendGiftAidEmail_(data) {
   GmailApp.sendEmail(data.to, subject, bodyText, {
     htmlBody: bodyHtml,
     attachments: [data.pdfBlob],
-    name: data.churchName,
+    name: data.orgName,
   });
 }
 
@@ -242,7 +252,7 @@ function sendGiftAidRejectedEmail_(data) {
 
   const bodyText =
     `Dear ${data.fullName},\n\n` +
-    `Thank you for submitting your response to ${data.churchName}.\n\n` +
+    `Thank you for submitting your response to ${data.orgName}.\n\n` +
     `We were unable to complete your Gift Aid declaration because one or more required confirmations were not agreed to.\n\n` +
     `Gift Aid consent response: ${data.giftAidConsent}\n` +
     `Taxpayer confirmation response: ${data.taxpayerConfirmation}\n` +
@@ -250,7 +260,7 @@ function sendGiftAidRejectedEmail_(data) {
     `If this was unintentional, please complete and submit the form again with the required confirmations selected.\n` +
     `If you have any questions, please contact donation@kccc.org.uk.\n\n` +
     `Kind regards,\n` +
-    `${data.churchName}`;
+    `${data.orgName}`;
 
   const bodyHtml = `
     <html>
@@ -258,7 +268,7 @@ function sendGiftAidRejectedEmail_(data) {
         <p>Dear ${escapeHtml_(data.fullName)},</p>
         <p>
           Thank you for submitting your response to
-          ${escapeHtml_(data.churchName)}.
+          ${escapeHtml_(data.orgName)}.
         </p>
         <p>
           We were unable to complete your Gift Aid declaration because one or more
@@ -281,7 +291,7 @@ function sendGiftAidRejectedEmail_(data) {
         </p>
         <p>
           Kind regards,<br>
-          ${escapeHtml_(data.churchName)}
+          ${escapeHtml_(data.orgName)}
         </p>
       </body>
     </html>
@@ -289,7 +299,7 @@ function sendGiftAidRejectedEmail_(data) {
 
   GmailApp.sendEmail(data.to, subject, bodyText, {
     htmlBody: bodyHtml,
-    name: data.churchName,
+    name: data.orgName,
   });
 }
 
@@ -316,7 +326,7 @@ function sendFinanceNotification_(data) {
   GmailApp.sendEmail(data.to, subject, bodyText, {
     htmlBody: bodyHtml,
     attachments: [data.pdfBlob],
-    name: data.churchName,
+    name: data.orgName,
   });
 }
 
@@ -350,7 +360,7 @@ function sendFinanceRejectionNotification_(data) {
 
   GmailApp.sendEmail(data.to, subject, bodyText, {
     htmlBody: bodyHtml,
-    name: data.churchName,
+    name: data.orgName,
   });
 }
 
