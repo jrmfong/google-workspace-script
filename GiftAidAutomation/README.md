@@ -37,15 +37,26 @@ When a respondent submits the Google Form:
 This repository is expected to contain:
 
 - the Google Apps Script source code
-- a template Google Docs file for generating the Gift Aid Declaration
+- a template PDF file for creating Google Doc template for generating the Gift Aid Declaration
 - this `README.md`
+
+## Google Docs Template
+
+Google Docs files are not stored directly in this repository.
+
+To use this project:
+
+1. Review the sample PDF in `GiftAidDeclarationTemplate.pdf`
+2. Create your own Google Docs template file
+3. Copy the wording and layout based on the sample
+4. Update the script with the Google Docs template file ID
 
 ## Deployment
 
 1. It is recommended to use a dedicated account to create the Google Form and deploy this script.
 2. Create the Google Form with reference to the sample Gift Aid declaration for multiple donations available here:  
    https://www.gov.uk/claim-gift-aid/gift-aid-declarations
-3. Create the template Google Docs file provided in this repository. Make sure the deployment account has read access to it.
+3. Create the template Google Docs file with reference to the template pdf provided in this repository. Make sure the deployment account has read access to the Google Doc file.
 4. Make sure the target storage folder exists in Google Drive. Create it if necessary. Make sure the deployment account has read and write access to it.
 5. Update the script constants as required.
 6. Attach the Apps Script project to the Google Form and configure the form submission trigger.
@@ -56,7 +67,7 @@ Update the constants in the script to match your environment, including:
 
 - template Google Docs file ID
 - target Google Drive folder ID
-- church name
+- organisation name
 - Finance Team email address
 
 ## Requirements
