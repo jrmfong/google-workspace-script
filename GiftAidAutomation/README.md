@@ -40,17 +40,6 @@ This repository contains:
 - a template PDF file for creating Google Doc template for generating the Gift Aid Declaration
 - this `README.md`
 
-## Google Docs Template
-
-Google Docs files are not stored directly in this repository.
-
-To use this project:
-
-1. Review the sample PDF in `GiftAidDeclarationTemplate.pdf`
-2. Create your own Google Docs template file
-3. Copy the wording and layout based on the sample
-4. Update the script with the Google Docs template file ID
-
 ## Requirements
 
 - Google Form
@@ -58,6 +47,17 @@ To use this project:
 - Google Drive access
 - Gmail access for sending email notifications
 - A Google Docs template file for the Gift Aid Declaration
+
+## Google Docs Template
+
+Google Docs template file is not stored in this repository.
+
+To use this project:
+
+1. Review the sample PDF in `GiftAidDeclarationTemplate.pdf`
+2. Create your own Google Docs template file
+3. Copy the wording and layout based on the sample
+4. Update the script with the Google Docs template file ID
 
 ## Configuration
 
